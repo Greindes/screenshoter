@@ -1,4 +1,4 @@
-QT += widgets
+QT += widgets gui
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -8,9 +8,11 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        buffersaver.cpp \
         dialog.cpp \
         main.cpp \
-        screenshot.cpp
+        screenshot.cpp \
+        simplescreenshot.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -21,5 +23,7 @@ FORMS += \
     dialog.ui
 
 HEADERS += \
+    buffersaver.h \
     dialog.h \
-    screenshot.h
+    screenshot.h \
+    simplescreenshot.h

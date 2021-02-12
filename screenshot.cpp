@@ -2,6 +2,7 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include "buffersaver.h"
 
 Screenshot::Screenshot(std::string savePath) : path(savePath)
 {
@@ -26,6 +27,7 @@ void Screenshot::saveScreenshot(std::string name)
     if (name == "")
         name = getScreenshotNameFromDate();
     //передай сохранение BufferSaver с именем файла и пути
+    saver->saveScreenshot(path, name);
 }
 
 
@@ -38,6 +40,16 @@ std::string Screenshot::getPath() const
 void Screenshot::setPath(const std::string &value)
 {
     path = value;
+}
+
+BufferSaver *Screenshot::getSaver() const
+{
+    return saver;
+}
+
+void Screenshot::setSaver(BufferSaver *value)
+{
+    saver = value;
 }
 
 //Генерирует строку в формате YYYY-MM-DD HH MM SS

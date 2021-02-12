@@ -21,6 +21,9 @@ public:
 
     std::string getPath() const;
     void setPath(const std::string &value);
+    BufferSaver *getSaver() const;
+    void setSaver(BufferSaver *value);
+
 private:
     //путь сохранения скриншотов
     std::string path;
