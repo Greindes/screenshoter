@@ -27,7 +27,8 @@ void Screenshot::saveScreenshot(std::string name)
     if (name == "")
         name = getScreenshotNameFromDate();
     //передай сохранение BufferSaver с именем файла и пути
-    saver->saveScreenshot(path, name);
+    if (saver)
+        saver->saveScreenshot(path, name);
 }
 
 

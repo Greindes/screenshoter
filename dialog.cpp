@@ -1,9 +1,19 @@
 #include "dialog.h"
 #include "ui_dialog.h"
+#include "simplescreenshot.h"
+#include "buffersaver.h"
 
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+
+#include <QShortcut>
+#include <QKeySequence>
+
+#include <QDebug>
+#include <QKeyEvent>
+
+#include <QFileDialog>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -14,12 +24,29 @@ Dialog::Dialog(QWidget *parent) :
     //инициализация иконки в трее
     createActions();
     createTrayIcon();
+    createShortcuts();
+    createScreenshoters();
     trayIcon->show();
 }
 
 Dialog::~Dialog()
 {
     delete ui;
+}
+
+void Dialog::takeSimpleScreenshot()
+{
+    qDebug() << "making screenshot!\n";
+
+    if (ui->savingGroupBox->isChecked()) {
+        simpleScr->takeAndSaveScreenshot();
+    } else
+        simpleScr->takeScreenshot();
+}
+
+void Dialog::takeCutScreenshot()
+{
+    //do something here
 }
 
 void Dialog::createActions()
@@ -40,4 +67,85 @@ void Dialog::createTrayIcon()
 
     trayIcon = new QSystemTrayIcon(QIcon("D:/CPP/MineSweeper/icons/3.png"));
     trayIcon->setContextMenu(trayIconMenu);
+}
+
+
+void Dialog::createShortcuts()
+{
+    QKeySequence seq = ui->simpleKeySequenceEdit->keySequence();
+    simpleScrShortcut = new QShortcut(QKeySequence(seq), this, SLOT(takeSimpleScreenshot()), nullptr, Qt::ApplicationShortcut);
+    seq = ui->cutKeySequenceEdit->keySequence();
+    cutScrShortcut = new QShortcut(QKeySequence(seq), this, SLOT(takeCutScreenshot()), nullptr, Qt::ApplicationShortcut);
+}
+
+void Dialog::createScreenshoters()
+{
+    simpleScr = new SimpleScreenshot;
+    //cutScr = new...
+}
+
+//вызывается при использовании переключателя выбора создания подкаталогов
+void Dialog::changeSaver(BufferSaver *s)
+{
+    BufferSaver* temp = simpleScr->getSaver();
+    simpleScr->setSaver(s);
+    //cutScr->setSaver(s);
+    if (!temp)
+        delete temp;
+}
+
+
+//нужно убрать
+void Dialog::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << event->key() << ' ' << event->text();
+}
+
+void Dialog::on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence)
+{
+    simpleScrShortcut->setKey(keySequence);
+}
+
+void Dialog::on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence)
+{
+    cutScrShortcut->setKey(keySequence);
+}
+
+void Dialog::on_simpleCheckBox_stateChanged(int arg1)
+{
+    simpleScrShortcut->setEnabled(arg1);
+}
+
+void Dialog::on_cutCheckBox_stateChanged(int arg1)
+{
+    cutScrShortcut->setEnabled(arg1);
+}
+
+void Dialog::on_noneRadioButton_pressed()
+{
+    changeSaver(new BufferSaver);
+}
+
+//Выбор каталога сохранения снимков
+void Dialog::on_saveFolderPushButton_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, "Выберите каталог");
+    if (path == "")
+        return;
+    qDebug() << path << " selected!\n";
+    if (path.back() != '/')
+        path += '/';
+    for (int i = ui->comboBox->count() - 1; i >= 0; --i) {
+        if (ui->comboBox->itemText(i) == path)
+            return;
+    }
+    ui->comboBox->addItem(path);
+    ui->comboBox->setCurrentIndex(ui->comboBox->count() - 1);
+}
+
+void Dialog::on_comboBox_currentTextChanged(const QString &path)
+{
+    std::string s = path.toStdString();
+    simpleScr->setPath(s);
+    //cutScr->setPath(s);
 }
