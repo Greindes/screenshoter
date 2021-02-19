@@ -2,7 +2,7 @@
 #define SCREENSHOT_H
 
 #include <string>
-
+#include <memory>
 class BufferSaver;
 
 class Screenshot
@@ -21,14 +21,15 @@ public:
 
     std::string getPath() const;
     void setPath(const std::string &value);
-    BufferSaver *getSaver() const;
-    void setSaver(BufferSaver *value);
+
+    std::shared_ptr<BufferSaver> getSaver() const;
+    void setSaver(const std::shared_ptr<BufferSaver> &value);
 
 private:
     //путь сохранения скриншотов
     std::string path;
     //отвечает за сохранение буфера в файле
-    BufferSaver * saver;
+    std::shared_ptr<BufferSaver> saver;
 
 };
 

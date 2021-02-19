@@ -15,6 +15,7 @@
 
 #include <QFileDialog>
 
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
@@ -65,7 +66,7 @@ void Dialog::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(quitAction);
 
-    trayIcon = new QSystemTrayIcon(QIcon("D:/CPP/MineSweeper/icons/3.png"));
+    trayIcon = new QSystemTrayIcon(QIcon("D:/CPP/MineSweeper/icons/3.png"), this);
     trayIcon->setContextMenu(trayIconMenu);
 }
 
@@ -81,17 +82,15 @@ void Dialog::createShortcuts()
 void Dialog::createScreenshoters()
 {
     simpleScr = new SimpleScreenshot;
+    qDebug() << "changing shortcut";
     //cutScr = new...
 }
 
 //вызывается при использовании переключателя выбора создания подкаталогов
-void Dialog::changeSaver(BufferSaver *s)
+void Dialog::changeSaver(std::shared_ptr<BufferSaver> s)
 {
-    BufferSaver* temp = simpleScr->getSaver();
     simpleScr->setSaver(s);
     //cutScr->setSaver(s);
-    if (!temp)
-        delete temp;
 }
 
 
@@ -123,7 +122,7 @@ void Dialog::on_cutCheckBox_stateChanged(int arg1)
 
 void Dialog::on_noneRadioButton_pressed()
 {
-    changeSaver(new BufferSaver);
+    changeSaver(std::make_shared<BufferSaver>(BufferSaver()));
 }
 
 //Выбор каталога сохранения снимков
@@ -148,4 +147,14 @@ void Dialog::on_comboBox_currentTextChanged(const QString &path)
     std::string s = path.toStdString();
     simpleScr->setPath(s);
     //cutScr->setPath(s);
+}
+
+void Dialog::on_simpleCheckBox_clicked(bool checked)
+{
+    ui->simpleKeySequenceEdit->setEnabled(checked);
+}
+
+void Dialog::on_cutCheckBox_clicked(bool checked)
+{
+    ui->cutKeySequenceEdit->setEnabled(checked);
 }

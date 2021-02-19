@@ -40,7 +40,7 @@ private:
     void createTrayIcon();
     void createShortcuts();
     void createScreenshoters();
-    void changeSaver(BufferSaver* s);
+    void changeSaver(std::shared_ptr<BufferSaver> s);
 
     // QWidget interface
 protected:
@@ -53,6 +53,8 @@ private slots:
     void on_noneRadioButton_pressed();
     void on_saveFolderPushButton_clicked();
     void on_comboBox_currentTextChanged(const QString &arg1);
+    void on_simpleCheckBox_clicked(bool checked);
+    void on_cutCheckBox_clicked(bool checked);
 };
 
 #endif // DIALOG_H

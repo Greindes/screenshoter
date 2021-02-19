@@ -43,15 +43,16 @@ void Screenshot::setPath(const std::string &value)
     path = value;
 }
 
-BufferSaver *Screenshot::getSaver() const
+std::shared_ptr<BufferSaver> Screenshot::getSaver() const
 {
     return saver;
 }
 
-void Screenshot::setSaver(BufferSaver *value)
+void Screenshot::setSaver(const std::shared_ptr<BufferSaver> &value)
 {
     saver = value;
 }
+
 
 //Генерирует строку в формате YYYY-MM-DD HH MM SS
 std::string Screenshot::getScreenshotNameFromDate()
