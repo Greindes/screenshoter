@@ -2,12 +2,12 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include "buffersaver.h"
 
 class QSystemTrayIcon;
 class QMenu;
 class QShortcut;
 class Screenshot;
-class BufferSaver;
 
 namespace Ui {
 class Dialog;
@@ -40,7 +40,7 @@ private:
     void createTrayIcon();
     void createShortcuts();
     void createScreenshoters();
-    void changeSaver(std::shared_ptr<BufferSaver> s);
+    void changeSaverSetting(BufferSaver::SubDirSettings sett);
 
     // QWidget interface
 protected:
@@ -55,6 +55,9 @@ private slots:
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_simpleCheckBox_clicked(bool checked);
     void on_cutCheckBox_clicked(bool checked);
+    void on_dayRadioButton_pressed();
+    void on_MonthRadioButton_pressed();
+    void on_YearRadioButton_pressed();
 };
 
 #endif // DIALOG_H

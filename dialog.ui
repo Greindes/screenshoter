@@ -66,6 +66,9 @@
                <property name="text">
                 <string>Нет</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -176,14 +179,14 @@
         </spacer>
        </item>
        <item row="0" column="1">
-        <widget class="QKeySequenceEdit" name="simpleKeySequenceEdit">
+        <widget class="CustomKeySequenceEdit" name="simpleKeySequenceEdit">
          <property name="enabled">
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QKeySequenceEdit" name="cutKeySequenceEdit">
+        <widget class="CustomKeySequenceEdit" name="cutKeySequenceEdit">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -226,6 +229,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomKeySequenceEdit</class>
+   <extends>QKeySequenceEdit</extends>
+   <header>customkeysequenceedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

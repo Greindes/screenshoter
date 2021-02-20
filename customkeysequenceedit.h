@@ -3,11 +3,18 @@
 
 #include <QKeySequenceEdit>
 
+class QKeyEvent;
+
 class CustomKeySequenceEdit : public QKeySequenceEdit
 {
     Q_OBJECT
+
 public:
-    CustomKeySequenceEdit();
+    explicit CustomKeySequenceEdit(QWidget *parent = nullptr);
+    ~CustomKeySequenceEdit();
+
+protected:
+    void keyPressEvent(QKeyEvent *pEvent);
 };
 
 #endif // CUSTOMKEYSEQUENCEEDIT_H

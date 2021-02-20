@@ -14,8 +14,7 @@ CustomKeySequenceEdit::~CustomKeySequenceEdit()
 
 void CustomKeySequenceEdit::keyPressEvent(QKeyEvent *pEvent)
 {
+    //QKeySequence seq();
+    setKeySequence(keySequence()[0]);
     QKeySequenceEdit::keyPressEvent(pEvent);
-
-    QKeySequence seq(QKeySequence::fromString(keySequence().toString().split(", ").first()));
-    setKeySequence(seq);
 }

@@ -23,10 +23,14 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 
     //инициализация иконки в трее
+    qDebug() << "Startu";
     createActions();
     createTrayIcon();
     createShortcuts();
+    qDebug() << "Middlu";
     createScreenshoters();
+    on_noneRadioButton_pressed();
+    qDebug() << "here";
     trayIcon->show();
 }
 
@@ -74,7 +78,7 @@ void Dialog::createTrayIcon()
 void Dialog::createShortcuts()
 {
     QKeySequence seq = ui->simpleKeySequenceEdit->keySequence();
-    simpleScrShortcut = new QShortcut(QKeySequence(seq), this, SLOT(takeSimpleScreenshot()), nullptr, Qt::ApplicationShortcut);
+    simpleScrShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(takeSimpleScreenshot()));
     seq = ui->cutKeySequenceEdit->keySequence();
     cutScrShortcut = new QShortcut(QKeySequence(seq), this, SLOT(takeCutScreenshot()), nullptr, Qt::ApplicationShortcut);
 }
@@ -82,15 +86,15 @@ void Dialog::createShortcuts()
 void Dialog::createScreenshoters()
 {
     simpleScr = new SimpleScreenshot;
+    simpleScr->setSaver(std::make_shared<BufferSaver>(BufferSaver()));
     qDebug() << "changing shortcut";
     //cutScr = new...
 }
 
 //вызывается при использовании переключателя выбора создания подкаталогов
-void Dialog::changeSaver(std::shared_ptr<BufferSaver> s)
+void Dialog::changeSaverSetting(BufferSaver::SubDirSettings sett)
 {
-    simpleScr->setSaver(s);
-    //cutScr->setSaver(s);
+    simpleScr->getSaver().get()->setSetting(sett);
 }
 
 
@@ -102,6 +106,8 @@ void Dialog::keyPressEvent(QKeyEvent *event)
 
 void Dialog::on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence)
 {
+    qDebug() << "Setting key to " << keySequence.count();
+    qDebug() << "Count for  " << ui->simpleKeySequenceEdit->keySequence().count();
     simpleScrShortcut->setKey(keySequence);
 }
 
@@ -112,6 +118,10 @@ void Dialog::on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySeq
 
 void Dialog::on_simpleCheckBox_stateChanged(int arg1)
 {
+    if (arg1)
+        qDebug() << "Screenshoter enabled!\n";
+    else
+        qDebug() << "Screenshoter disabled!\n";
     simpleScrShortcut->setEnabled(arg1);
 }
 
@@ -120,10 +130,6 @@ void Dialog::on_cutCheckBox_stateChanged(int arg1)
     cutScrShortcut->setEnabled(arg1);
 }
 
-void Dialog::on_noneRadioButton_pressed()
-{
-    changeSaver(std::make_shared<BufferSaver>(BufferSaver()));
-}
 
 //Выбор каталога сохранения снимков
 void Dialog::on_saveFolderPushButton_clicked()
@@ -157,4 +163,24 @@ void Dialog::on_simpleCheckBox_clicked(bool checked)
 void Dialog::on_cutCheckBox_clicked(bool checked)
 {
     ui->cutKeySequenceEdit->setEnabled(checked);
+}
+
+void Dialog::on_noneRadioButton_pressed()
+{
+    changeSaverSetting(BufferSaver::NONE);
+}
+
+void Dialog::on_dayRadioButton_pressed()
+{
+    changeSaverSetting(BufferSaver::DAY);
+}
+
+void Dialog::on_MonthRadioButton_pressed()
+{
+    changeSaverSetting(BufferSaver::MONTH);
+}
+
+void Dialog::on_YearRadioButton_pressed()
+{
+    changeSaverSetting(BufferSaver::YEAR);
 }
