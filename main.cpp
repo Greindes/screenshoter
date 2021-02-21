@@ -1,8 +1,5 @@
 #include <QApplication>
 #include "dialog.h"
-#include "simplescreenshot.h"
-#include "buffersaver.h"
-#include <QHotkey>
 
 int main(int argc, char *argv[])
 {

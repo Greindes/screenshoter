@@ -15,6 +15,9 @@
 
 #include <QFileDialog>
 
+#include <QStandardPaths>
+
+#include <QHotkey>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -23,14 +26,15 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 
     //инициализация иконки в трее
-    qDebug() << "Startu";
+    qDebug() << "Initializing";
     createActions();
     createTrayIcon();
-    createShortcuts();
-    qDebug() << "Middlu";
+    createAndConnectShortcuts();
+    qDebug() << "After shortcuts";
     createScreenshoters();
     on_noneRadioButton_pressed();
     qDebug() << "here";
+    setDefaultSavePath();
     trayIcon->show();
 }
 
@@ -75,12 +79,27 @@ void Dialog::createTrayIcon()
 }
 
 
-void Dialog::createShortcuts()
+void Dialog::createAndConnectShortcuts()
 {
+    //Снимок всего экрана
     QKeySequence seq = ui->simpleKeySequenceEdit->keySequence();
-    simpleScrShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(takeSimpleScreenshot()));
+    simpleScrShortcut = new QHotkey(seq, false, this);
+    //on/of
+    connect(ui->simpleCheckBox, &QCheckBox::toggled,
+            simpleScrShortcut, &QHotkey::setRegistered);
+    //pressed
+    connect(simpleScrShortcut, &QHotkey::activated,
+            this, &Dialog::takeSimpleScreenshot);
+
+    //снимок с вырезанием
     seq = ui->cutKeySequenceEdit->keySequence();
-    cutScrShortcut = new QShortcut(QKeySequence(seq), this, SLOT(takeCutScreenshot()), nullptr, Qt::ApplicationShortcut);
+    cutScrShortcut = new QHotkey(seq, false, this);
+    //on/of
+    connect(ui->cutCheckBox, &QCheckBox::toggled,
+            cutScrShortcut, &QHotkey::setRegistered);
+    //pressed
+    connect(cutScrShortcut, &QHotkey::activated,
+            this, &Dialog::takeCutScreenshot);
 }
 
 void Dialog::createScreenshoters()
@@ -97,6 +116,13 @@ void Dialog::changeSaverSetting(BufferSaver::SubDirSettings sett)
     simpleScr->getSaver().get()->setSetting(sett);
 }
 
+void Dialog::setDefaultSavePath()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    qDebug() << "Path to images: " << path;
+    ui->saveFolderComboBox->addItem(path + "/Screens/");
+}
+
 
 //нужно убрать
 void Dialog::keyPressEvent(QKeyEvent *event)
@@ -108,12 +134,12 @@ void Dialog::on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &key
 {
     qDebug() << "Setting key to " << keySequence.count();
     qDebug() << "Count for  " << ui->simpleKeySequenceEdit->keySequence().count();
-    simpleScrShortcut->setKey(keySequence);
+    simpleScrShortcut->setShortcut(keySequence, true);
 }
 
 void Dialog::on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence)
 {
-    cutScrShortcut->setKey(keySequence);
+    cutScrShortcut->setShortcut(keySequence, true);
 }
 
 void Dialog::on_simpleCheckBox_stateChanged(int arg1)
@@ -122,12 +148,10 @@ void Dialog::on_simpleCheckBox_stateChanged(int arg1)
         qDebug() << "Screenshoter enabled!\n";
     else
         qDebug() << "Screenshoter disabled!\n";
-    simpleScrShortcut->setEnabled(arg1);
 }
 
 void Dialog::on_cutCheckBox_stateChanged(int arg1)
 {
-    cutScrShortcut->setEnabled(arg1);
 }
 
 
@@ -140,18 +164,19 @@ void Dialog::on_saveFolderPushButton_clicked()
     qDebug() << path << " selected!\n";
     if (path.back() != '/')
         path += '/';
-    for (int i = ui->comboBox->count() - 1; i >= 0; --i) {
-        if (ui->comboBox->itemText(i) == path)
+    for (int i = ui->saveFolderComboBox->count() - 1; i >= 0; --i) {
+        if (ui->saveFolderComboBox->itemText(i) == path)
             return;
     }
-    ui->comboBox->addItem(path);
-    ui->comboBox->setCurrentIndex(ui->comboBox->count() - 1);
+    ui->saveFolderComboBox->addItem(path);
+    ui->saveFolderComboBox->setCurrentIndex(ui->saveFolderComboBox->count() - 1);
 }
 
-void Dialog::on_comboBox_currentTextChanged(const QString &path)
+void Dialog::on_saveFolderComboBox_currentTextChanged(const QString &path)
 {
     std::string s = path.toStdString();
     simpleScr->setPath(s);
+    qDebug() << "changing screenshot path!";
     //cutScr->setPath(s);
 }
 

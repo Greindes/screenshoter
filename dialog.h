@@ -6,7 +6,7 @@
 
 class QSystemTrayIcon;
 class QMenu;
-class QShortcut;
+class QHotkey;
 class Screenshot;
 
 namespace Ui {
@@ -31,16 +31,17 @@ private:
     QAction* settingsAction;
     QAction* quitAction;
 
-    QShortcut* simpleScrShortcut;
-    QShortcut* cutScrShortcut;
+    QHotkey* simpleScrShortcut;
+    QHotkey* cutScrShortcut;
 
     Screenshot* simpleScr;
     Screenshot* cutScr;
     void createActions();
     void createTrayIcon();
-    void createShortcuts();
+    void createAndConnectShortcuts();
     void createScreenshoters();
     void changeSaverSetting(BufferSaver::SubDirSettings sett);
+    void setDefaultSavePath();
 
     // QWidget interface
 protected:
@@ -52,7 +53,7 @@ private slots:
     void on_cutCheckBox_stateChanged(int arg1);
     void on_noneRadioButton_pressed();
     void on_saveFolderPushButton_clicked();
-    void on_comboBox_currentTextChanged(const QString &arg1);
+    void on_saveFolderComboBox_currentTextChanged(const QString &arg1);
     void on_simpleCheckBox_clicked(bool checked);
     void on_cutCheckBox_clicked(bool checked);
     void on_dayRadioButton_pressed();
