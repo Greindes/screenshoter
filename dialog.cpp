@@ -34,12 +34,15 @@ Dialog::Dialog(QWidget *parent) :
     createScreenshoters();
     on_noneRadioButton_pressed();
     qDebug() << "here";
+    loadSettings();
     setDefaultSavePath();
+    qDebug() << "finished loading settings";
     trayIcon->show();
 }
 
 Dialog::~Dialog()
 {
+    updateSettings();
     delete ui;
 }
 
@@ -118,9 +121,78 @@ void Dialog::changeSaverSetting(BufferSaver::SubDirSettings sett)
 
 void Dialog::setDefaultSavePath()
 {
+    //не создавать если путь уже существует
+    if (ui->saveFolderComboBox->count() > 0)
+        return;
     QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
     qDebug() << "Path to images: " << path;
     ui->saveFolderComboBox->addItem(path + "/Screens/");
+}
+
+void Dialog::loadSettings()
+{
+    settingsManager.readSettings();
+    auto settings = settingsManager.getScrSetting();
+    //простой снимок
+    ui->simpleCheckBox->setChecked(settings.simpleScrEnabled);
+    ui->simpleKeySequenceEdit->setKeySequence(QKeySequence(settings.simpleScrKey));
+    //снимок с вырезанием
+    ui->cutCheckBox->setChecked(settings.cutScrEnabled);
+    ui->cutKeySequenceEdit->setKeySequence(QKeySequence(settings.cutScrKey));
+    //сохранение в файл
+    ui->savingGroupBox->setChecked(settings.savingEnabled);
+    //пути сохранения
+    for (int i = 0; i < 5; ++i) {
+        QString path = settings.savePaths[i];
+        if (path != "")
+            ui->saveFolderComboBox->addItem(path);
+    }
+    //уведомления
+    ui->notificationCheckBox->setChecked(settings.notificationEnabled);
+    //подкаталоги
+    switch (settings.subDirectoryCreation) {
+    case 0:
+        ui->noneRadioButton->setChecked(true); break;
+    case 1:
+        ui->yearRadioButton->setChecked(true); break;
+    case 2:
+        ui->monthRadioButton->setChecked(true); break;
+    case 3:
+        ui->dayRadioButton->setChecked(true);
+    }
+}
+
+void Dialog::updateSettings()
+{
+    SettingsManager::screenshotSettings settings;
+    //простой снимок
+    settings.simpleScrEnabled = ui->simpleCheckBox->isChecked();
+    if (ui->simpleKeySequenceEdit->keySequence().count() > 0)
+        settings.simpleScrKey = ui->simpleKeySequenceEdit->keySequence()[0];
+    //снимок с вырезанием
+    settings.cutScrEnabled = ui->cutCheckBox->isChecked();
+    if (ui->cutKeySequenceEdit->keySequence().count() > 0)
+        settings.cutScrKey = ui->cutKeySequenceEdit->keySequence()[0];
+    //сохранение в файл
+    settings.savingEnabled = ui->savingGroupBox->isChecked();
+    //пути сохранения
+    int size = std::min(5, ui->saveFolderComboBox->count());
+    for (int i = 0; i < size; ++i)
+        settings.savePaths[i] = ui->saveFolderComboBox->itemText(i);
+    //уведомления
+    settings.notificationEnabled = ui->notificationCheckBox->isChecked();
+    //подкаталоги
+    if (ui->yearRadioButton->isChecked())
+        settings.subDirectoryCreation = 1;
+    else if (ui->monthRadioButton->isChecked())
+        settings.subDirectoryCreation = 2;
+    else if (ui->dayRadioButton->isChecked())
+        settings.subDirectoryCreation = 3;
+    else
+        settings.subDirectoryCreation = 0;
+
+    settingsManager.setScrSetting(settings);
+    settingsManager.saveSettings();
 }
 
 
@@ -170,6 +242,8 @@ void Dialog::on_saveFolderPushButton_clicked()
     }
     ui->saveFolderComboBox->addItem(path);
     ui->saveFolderComboBox->setCurrentIndex(ui->saveFolderComboBox->count() - 1);
+    while (ui->saveFolderComboBox->count() > 5)
+        ui->saveFolderComboBox->removeItem(0);
 }
 
 void Dialog::on_saveFolderComboBox_currentTextChanged(const QString &path)
@@ -200,12 +274,12 @@ void Dialog::on_dayRadioButton_pressed()
     changeSaverSetting(BufferSaver::DAY);
 }
 
-void Dialog::on_MonthRadioButton_pressed()
+void Dialog::on_monthRadioButton_pressed()
 {
     changeSaverSetting(BufferSaver::MONTH);
 }
 
-void Dialog::on_YearRadioButton_pressed()
+void Dialog::on_yearRadioButton_pressed()
 {
     changeSaverSetting(BufferSaver::YEAR);
 }

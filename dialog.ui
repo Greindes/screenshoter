@@ -76,17 +76,20 @@
                <property name="text">
                 <string>День</string>
                </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="MonthRadioButton">
+              <widget class="QRadioButton" name="monthRadioButton">
                <property name="text">
                 <string>Месяц</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="YearRadioButton">
+              <widget class="QRadioButton" name="yearRadioButton">
                <property name="text">
                 <string>Год</string>
                </property>
@@ -96,7 +99,7 @@
            </widget>
           </item>
           <item row="2" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="notificationCheckBox">
             <property name="text">
              <string>Показывать уведомления о создании скриншота</string>
             </property>

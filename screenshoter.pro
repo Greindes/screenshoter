@@ -15,6 +15,7 @@ SOURCES += \
         dialog.cpp \
         main.cpp \
         screenshot.cpp \
+        settingsmanager.cpp \
         simplescreenshot.cpp
 
 # Default rules for deployment.
@@ -30,4 +31,5 @@ HEADERS += \
     customkeysequenceedit.h \
     dialog.h \
     screenshot.h \
+    settingsmanager.h \
     simplescreenshot.h

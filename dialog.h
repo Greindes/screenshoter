@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "buffersaver.h"
+#include "settingsmanager.h"
 
 class QSystemTrayIcon;
 class QMenu;
@@ -36,6 +37,8 @@ private:
 
     Screenshot* simpleScr;
     Screenshot* cutScr;
+
+    SettingsManager settingsManager;
     void createActions();
     void createTrayIcon();
     void createAndConnectShortcuts();
@@ -43,6 +46,8 @@ private:
     void changeSaverSetting(BufferSaver::SubDirSettings sett);
     void setDefaultSavePath();
 
+    void loadSettings();
+    void updateSettings();
     // QWidget interface
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -57,8 +62,8 @@ private slots:
     void on_simpleCheckBox_clicked(bool checked);
     void on_cutCheckBox_clicked(bool checked);
     void on_dayRadioButton_pressed();
-    void on_MonthRadioButton_pressed();
-    void on_YearRadioButton_pressed();
+    void on_monthRadioButton_pressed();
+    void on_yearRadioButton_pressed();
 };
 
 #endif // DIALOG_H
