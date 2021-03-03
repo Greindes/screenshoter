@@ -12,8 +12,10 @@ include(vendor/vendor.pri)
 SOURCES += \
         buffersaver.cpp \
         customkeysequenceedit.cpp \
+        cutscreenshot.cpp \
         dialog.cpp \
         main.cpp \
+        scene.cpp \
         screenshot.cpp \
         settingsmanager.cpp \
         simplescreenshot.cpp
@@ -29,7 +31,12 @@ FORMS += \
 HEADERS += \
     buffersaver.h \
     customkeysequenceedit.h \
+    cutscreenshot.h \
     dialog.h \
+    scene.h \
     screenshot.h \
     settingsmanager.h \
     simplescreenshot.h
+
+RESOURCES += \
+    icons.qrc

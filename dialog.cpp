@@ -1,6 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "simplescreenshot.h"
+#include "cutscreenshot.h"
 #include "buffersaver.h"
 
 #include <QSystemTrayIcon>
@@ -33,7 +34,6 @@ Dialog::Dialog(QWidget *parent) :
     qDebug() << "After shortcuts";
     createScreenshoters();
     on_noneRadioButton_pressed();
-    qDebug() << "here";
     loadSettings();
     setDefaultSavePath();
     qDebug() << "finished loading settings";
@@ -50,15 +50,28 @@ void Dialog::takeSimpleScreenshot()
 {
     qDebug() << "making screenshot!\n";
 
-    if (ui->savingGroupBox->isChecked()) {
-        simpleScr->takeAndSaveScreenshot();
-    } else
-        simpleScr->takeScreenshot();
+    bool isTaken;
+    if (ui->savingGroupBox->isChecked())
+        isTaken = simpleScr->takeAndSaveScreenshot();
+    else
+        isTaken = simpleScr->takeScreenshot();
+    if (isTaken)
+        on_screenshotTaken();
 }
 
 void Dialog::takeCutScreenshot()
 {
     //do something here
+    if (ui->savingGroupBox->isChecked())
+        cutScr->takeAndSaveScreenshot();
+    else
+        cutScr->takeScreenshot();
+}
+
+void Dialog::on_screenshotTaken()
+{
+    if (ui->notificationCheckBox->isChecked())
+        trayIcon->showMessage("Уведомление", "Снимок сделан", QSystemTrayIcon::Information, 3000);
 }
 
 void Dialog::createActions()
@@ -77,7 +90,7 @@ void Dialog::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(quitAction);
 
-    trayIcon = new QSystemTrayIcon(QIcon("D:/CPP/MineSweeper/icons/3.png"), this);
+    trayIcon = new QSystemTrayIcon(QIcon(":/icons/camera.png"), this);
     trayIcon->setContextMenu(trayIconMenu);
 }
 
@@ -110,7 +123,9 @@ void Dialog::createScreenshoters()
     simpleScr = new SimpleScreenshot;
     simpleScr->setSaver(std::make_shared<BufferSaver>(BufferSaver()));
     qDebug() << "changing shortcut";
-    //cutScr = new...
+    cutScr = new CutScreenshot;
+    cutScr->setSaver(simpleScr->getSaver());
+    connect(cutScr, &CutScreenshot::screenshotTaken, this, &Dialog::on_screenshotTaken);
 }
 
 //вызывается при использовании переключателя выбора создания подкаталогов
@@ -135,13 +150,16 @@ void Dialog::loadSettings()
     auto settings = settingsManager.getScrSetting();
     //простой снимок
     ui->simpleCheckBox->setChecked(settings.simpleScrEnabled);
+    ui->simpleKeySequenceEdit->setEnabled(settings.simpleScrEnabled);
     ui->simpleKeySequenceEdit->setKeySequence(QKeySequence(settings.simpleScrKey));
     //снимок с вырезанием
     ui->cutCheckBox->setChecked(settings.cutScrEnabled);
+    ui->cutKeySequenceEdit->setEnabled(settings.cutScrEnabled);
     ui->cutKeySequenceEdit->setKeySequence(QKeySequence(settings.cutScrKey));
     //сохранение в файл
     ui->savingGroupBox->setChecked(settings.savingEnabled);
     //пути сохранения
+    ui->saveFolderComboBox->clear();
     for (int i = 0; i < 5; ++i) {
         QString path = settings.savePaths[i];
         if (path != "")
@@ -214,17 +232,6 @@ void Dialog::on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySeq
     cutScrShortcut->setShortcut(keySequence, true);
 }
 
-void Dialog::on_simpleCheckBox_stateChanged(int arg1)
-{
-    if (arg1)
-        qDebug() << "Screenshoter enabled!\n";
-    else
-        qDebug() << "Screenshoter disabled!\n";
-}
-
-void Dialog::on_cutCheckBox_stateChanged(int arg1)
-{
-}
 
 
 //Выбор каталога сохранения снимков
@@ -246,12 +253,18 @@ void Dialog::on_saveFolderPushButton_clicked()
         ui->saveFolderComboBox->removeItem(0);
 }
 
+void Dialog::on_removeFolderPushButton_clicked()
+{
+    if (ui->saveFolderComboBox->count() > 0)
+        ui->saveFolderComboBox->removeItem(ui->saveFolderComboBox->currentIndex());
+}
+
 void Dialog::on_saveFolderComboBox_currentTextChanged(const QString &path)
 {
     std::string s = path.toStdString();
     simpleScr->setPath(s);
     qDebug() << "changing screenshot path!";
-    //cutScr->setPath(s);
+    cutScr->setPath(s);
 }
 
 void Dialog::on_simpleCheckBox_clicked(bool checked)
@@ -282,4 +295,18 @@ void Dialog::on_monthRadioButton_pressed()
 void Dialog::on_yearRadioButton_pressed()
 {
     changeSaverSetting(BufferSaver::YEAR);
+}
+
+
+
+void Dialog::on_okButton_clicked()
+{
+    updateSettings();
+    close();
+}
+
+void Dialog::on_cancelButton_clicked()
+{
+    loadSettings();
+    close();
 }

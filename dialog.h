@@ -9,6 +9,7 @@ class QSystemTrayIcon;
 class QMenu;
 class QHotkey;
 class Screenshot;
+class CutScreenshot;
 
 namespace Ui {
 class Dialog;
@@ -25,6 +26,7 @@ public:
 public slots:
     void takeSimpleScreenshot();
     void takeCutScreenshot();
+    void on_screenshotTaken();
 private:
     Ui::Dialog *ui;
     QSystemTrayIcon* trayIcon;
@@ -36,7 +38,7 @@ private:
     QHotkey* cutScrShortcut;
 
     Screenshot* simpleScr;
-    Screenshot* cutScr;
+    CutScreenshot* cutScr;
 
     SettingsManager settingsManager;
     void createActions();
@@ -54,8 +56,6 @@ protected:
 private slots:
     void on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence);
     void on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence);
-    void on_simpleCheckBox_stateChanged(int arg1);
-    void on_cutCheckBox_stateChanged(int arg1);
     void on_noneRadioButton_pressed();
     void on_saveFolderPushButton_clicked();
     void on_saveFolderComboBox_currentTextChanged(const QString &arg1);
@@ -64,6 +64,9 @@ private slots:
     void on_dayRadioButton_pressed();
     void on_monthRadioButton_pressed();
     void on_yearRadioButton_pressed();
+    void on_removeFolderPushButton_clicked();
+    void on_okButton_clicked();
+    void on_cancelButton_clicked();
 };
 
 #endif // DIALOG_H
