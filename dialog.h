@@ -2,8 +2,8 @@
 #define DIALOG_H
 
 #include <QDialog>
-#include "buffersaver.h"
-#include "settingsmanager.h"
+#include "BufferSaver.h"
+#include "SettingsManager.h"
 
 class QSystemTrayIcon;
 class QMenu;
@@ -50,9 +50,6 @@ private:
 
     void loadSettings();
     void updateSettings();
-    // QWidget interface
-protected:
-    virtual void keyPressEvent(QKeyEvent *event) override;
 private slots:
     void on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence);
     void on_cutKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence);

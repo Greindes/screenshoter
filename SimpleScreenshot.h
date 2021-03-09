@@ -1,7 +1,7 @@
 #ifndef SIMPLESCREENSHOT_H
 #define SIMPLESCREENSHOT_H
 
-#include "screenshot.h"
+#include "Screenshot.h"
 
 //скриншот представляет собой снимок экрана
 class SimpleScreenshot : public Screenshot

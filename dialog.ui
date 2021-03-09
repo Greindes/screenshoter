@@ -42,7 +42,7 @@
           <bool>true</bool>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="verticalSpacing">
@@ -181,12 +181,18 @@
          <property name="text">
           <string>Сохранение всего экрана</string>
          </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
         <widget class="QCheckBox" name="cutCheckBox">
          <property name="text">
           <string>Сохранение выбранной части экрана</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

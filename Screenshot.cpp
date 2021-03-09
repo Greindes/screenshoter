@@ -1,8 +1,8 @@
-#include "screenshot.h"
+#include "Screenshot.h"
 #include <ctime>
 #include <sstream>
 #include <iomanip>
-#include "buffersaver.h"
+#include "BufferSaver.h"
 
 Screenshot::Screenshot(std::string savePath) : path(savePath)
 {
@@ -62,7 +62,7 @@ std::string Screenshot::getScreenshotNameFromDate()
     std::tm * curDate = std::localtime(&t);
     std::stringstream ss;
     ss << std::setfill('0');
-    ss << (curDate->tm_year + 1900) << '-' << std::setw(2) << curDate->tm_mon << '-'
+    ss << (curDate->tm_year + 1900) << '-' << std::setw(2) << (curDate->tm_mon + 1) << '-'
           << std::setw(2) << curDate->tm_mday << " " << std::setw(2) << curDate->tm_hour
           << ' ' << std::setw(2) << curDate->tm_min << ' ' << std::setw(2) << curDate->tm_sec;
     name = ss.str();

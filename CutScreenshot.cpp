@@ -1,13 +1,10 @@
-#include "cutscreenshot.h"
+#include "CutScreenshot.h"
 #include <QScreen>
 #include <QGuiApplication>
 #include <QPixmap>
 #include <QClipboard>
 #include <QGraphicsView>
-#include "scene.h"
-
-
-#include <QDebug>
+#include "ScreenScene.h"
 
 CutScreenshot::CutScreenshot(std::string savePath) : Screenshot(savePath)
 {
@@ -15,7 +12,10 @@ CutScreenshot::CutScreenshot(std::string savePath) : Screenshot(savePath)
     view = new QGraphicsView(scene);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    //view->setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    //view->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint|Qt::Window);
+    view->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    view->setFrameStyle(QFrame::NoFrame);
     connect(scene, &Scene::screenshotTaken, view, &QWidget::close);
 }
 
@@ -46,21 +46,6 @@ bool CutScreenshot::takeScreenshot()
     connect(scene, &Scene::screenshotTaken, this, &CutScreenshot::on_screenshotTaken);
     view->showFullScreen();
     return true;
-    /*
-    //Такой вариант не подходит, нужно использовать слоты/сигналы!!!
-    qDebug() << "Taking cut screenshot! ";
-    Scene scene(&screenshot);
-    QGraphicsView * view = new QGraphicsView(&scene);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setAttribute(Qt::WA_DeleteOnClose);
-    view->connect(&scene, &Scene::screenshotTaken, view, &QWidget::close);
-    view->showFullScreen();
-    if (screenshot.isNull())
-        return false;
-    qDebug() << "Finished taking cut screenshot!";
-    QGuiApplication::clipboard()->setPixmap(screenshot);
-    return true;*/
 }
 
 

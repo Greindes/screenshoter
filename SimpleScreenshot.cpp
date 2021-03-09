@@ -1,4 +1,4 @@
-#include "simplescreenshot.h"
+#include "SimpleScreenshot.h"
 #include <QScreen>
 #include <QGuiApplication>
 #include <QPixmap>

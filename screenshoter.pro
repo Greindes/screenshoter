@@ -1,6 +1,6 @@
-QT += widgets gui
+QT += widgets
 
-CONFIG += c++11 console
+CONFIG += c++11
 CONFIG -= app_bundle
 
 include(vendor/vendor.pri)
@@ -10,15 +10,16 @@ include(vendor/vendor.pri)
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        buffersaver.cpp \
-        customkeysequenceedit.cpp \
-        cutscreenshot.cpp \
+        BufferSaver.cpp \
+        CustomKeySequenceEdit.cpp \
+        CutScreenshot.cpp \
+        RunGuard.cpp \
+        ScreenScene.cpp \
+        Screenshot.cpp \
+        SettingsManager.cpp \
+        SimpleScreenshot.cpp \
         dialog.cpp \
-        main.cpp \
-        scene.cpp \
-        screenshot.cpp \
-        settingsmanager.cpp \
-        simplescreenshot.cpp
+        main.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -29,14 +30,15 @@ FORMS += \
     dialog.ui
 
 HEADERS += \
-    buffersaver.h \
-    customkeysequenceedit.h \
-    cutscreenshot.h \
-    dialog.h \
-    scene.h \
-    screenshot.h \
-    settingsmanager.h \
-    simplescreenshot.h
+    BufferSaver.h \
+    CustomKeySequenceEdit.h \
+    CutScreenshot.h \
+    RunGuard.h \
+    ScreenScene.h \
+    Screenshot.h \
+    SettingsManager.h \
+    SimpleScreenshot.h \
+    dialog.h
 
 RESOURCES += \
     icons.qrc

@@ -1,12 +1,10 @@
-#include "buffersaver.h"
+#include "BufferSaver.h"
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QImage>
 #include <QFile>
 #include <QDir>
 #include <ctime>
-
-#include <QDebug>
 
 static const QString months[] = {"Januray", "February", "March", "April", "May",
                                    "June", "July", "August", "September",
@@ -21,8 +19,6 @@ BufferSaver::~BufferSaver()
 {
 
 }
-
-//НУЖНА ПРОВЕРКА СУЩЕСТВОВАНИЯ ПОДКАТАЛОГОВ И ИХ СОЗДАНИЕ
 
 bool BufferSaver::saveScreenshot(const std::string &path, const std::string &name)
 {
@@ -45,7 +41,6 @@ bool BufferSaver::saveScreenshot(const std::string &path, const std::string &nam
             }
         }
     }
-    qDebug() << "Path: " << fullPath << '\n';
     QDir dir(fullPath);
     dir.mkpath(fullPath);
     QFile file(fullPath + QString::fromStdString(name) + ".png");

@@ -1,19 +1,22 @@
-#include "scene.h"
+#include "ScreenScene.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsRectItem>
 #include <QKeyEvent>
 
-
+//QGraphicsScene(QRectF(0, 0, 1366, 768), parent)
 Scene::Scene(QObject *parent) : QGraphicsScene(parent)
 {
+
 }
 
 void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    rect = addRect(QRectF(event->scenePos(), QSizeF(0.0, 0.0)));
+    rect = addRect(QRectF(event->scenePos(), QSizeF(0.0, 0.0)),
+                   QPen(QColor(Qt::red), 3, Qt::DashLine),
+                   QBrush(Qt::black));
+    rect->setOpacity(0.11);
     x0 = rect->rect().x();
     y0 = rect->rect().y();
-    rect->setPen(QPen(QColor(Qt::black), 3, Qt::DashLine));
     //if left button press {
     //x0 = x, y0 = y;
     //}
@@ -49,13 +52,15 @@ QPixmap Scene::getImg() const
     return img;
 }
 
-void Scene::setImg(const QPixmap &value)
+void Scene::setImg(const QPixmap &pix)
 {
-    img = value;
+    img = pix;
     clear();
-    auto * ptr = addPixmap(img.copy(0, 0, img.width() - 2, img.height() - 2));
-    auto * rect = addRect(0, 0, img.width() - 3, img.height() - 3, QPen(), QBrush(Qt::white));
-    rect->setOpacity(0.3);
+    //auto * rect = addRect(0, 0, img.width(), img.height(), QPen(), QBrush(Qt::white));
+    setSceneRect(0, 0, img.width(), img.height());
+    addPixmap(img.copy(0, 0, img.width(), img.height()));
+    auto * rect = addRect(0, 0, img.width(), img.height(), QPen(), QBrush(Qt::white));
+    rect->setOpacity(0.30);
 }
 
 

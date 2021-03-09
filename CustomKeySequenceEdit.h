@@ -5,6 +5,7 @@
 
 class QKeyEvent;
 
+//потомок QKeySequenceEdit, ограничивающий размер последовательности хоткеев до одного
 class CustomKeySequenceEdit : public QKeySequenceEdit
 {
     Q_OBJECT

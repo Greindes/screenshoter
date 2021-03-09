@@ -1,4 +1,4 @@
-#include "customkeysequenceedit.h"
+#include "CustomKeySequenceEdit.h"
 #include <QKeyEvent>
 
 CustomKeySequenceEdit::CustomKeySequenceEdit(QWidget *parent)

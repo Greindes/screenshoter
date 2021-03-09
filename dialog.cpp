@@ -1,8 +1,8 @@
 #include "dialog.h"
 #include "ui_dialog.h"
-#include "simplescreenshot.h"
-#include "cutscreenshot.h"
-#include "buffersaver.h"
+#include "SimpleScreenshot.h"
+#include "CutScreenshot.h"
+#include "BufferSaver.h"
 
 #include <QSystemTrayIcon>
 #include <QMenu>
@@ -10,9 +10,6 @@
 
 #include <QShortcut>
 #include <QKeySequence>
-
-#include <QDebug>
-#include <QKeyEvent>
 
 #include <QFileDialog>
 
@@ -27,16 +24,13 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 
     //инициализация иконки в трее
-    qDebug() << "Initializing";
     createActions();
     createTrayIcon();
     createAndConnectShortcuts();
-    qDebug() << "After shortcuts";
     createScreenshoters();
     on_noneRadioButton_pressed();
     loadSettings();
     setDefaultSavePath();
-    qDebug() << "finished loading settings";
     trayIcon->show();
 }
 
@@ -48,8 +42,8 @@ Dialog::~Dialog()
 
 void Dialog::takeSimpleScreenshot()
 {
-    qDebug() << "making screenshot!\n";
-
+    if (!ui->simpleCheckBox->isChecked())
+        return;
     bool isTaken;
     if (ui->savingGroupBox->isChecked())
         isTaken = simpleScr->takeAndSaveScreenshot();
@@ -61,6 +55,8 @@ void Dialog::takeSimpleScreenshot()
 
 void Dialog::takeCutScreenshot()
 {
+    if (!ui->cutCheckBox->isChecked())
+        return;
     //do something here
     if (ui->savingGroupBox->isChecked())
         cutScr->takeAndSaveScreenshot();
@@ -70,7 +66,7 @@ void Dialog::takeCutScreenshot()
 
 void Dialog::on_screenshotTaken()
 {
-    if (ui->notificationCheckBox->isChecked())
+    if (ui->savingGroupBox->isChecked() && ui->notificationCheckBox->isChecked())
         trayIcon->showMessage("Уведомление", "Снимок сделан", QSystemTrayIcon::Information, 3000);
 }
 
@@ -122,7 +118,6 @@ void Dialog::createScreenshoters()
 {
     simpleScr = new SimpleScreenshot;
     simpleScr->setSaver(std::make_shared<BufferSaver>(BufferSaver()));
-    qDebug() << "changing shortcut";
     cutScr = new CutScreenshot;
     cutScr->setSaver(simpleScr->getSaver());
     connect(cutScr, &CutScreenshot::screenshotTaken, this, &Dialog::on_screenshotTaken);
@@ -140,7 +135,6 @@ void Dialog::setDefaultSavePath()
     if (ui->saveFolderComboBox->count() > 0)
         return;
     QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-    qDebug() << "Path to images: " << path;
     ui->saveFolderComboBox->addItem(path + "/Screens/");
 }
 
@@ -214,16 +208,8 @@ void Dialog::updateSettings()
 }
 
 
-//нужно убрать
-void Dialog::keyPressEvent(QKeyEvent *event)
-{
-    qDebug() << event->key() << ' ' << event->text();
-}
-
 void Dialog::on_simpleKeySequenceEdit_keySequenceChanged(const QKeySequence &keySequence)
 {
-    qDebug() << "Setting key to " << keySequence.count();
-    qDebug() << "Count for  " << ui->simpleKeySequenceEdit->keySequence().count();
     simpleScrShortcut->setShortcut(keySequence, true);
 }
 
@@ -240,7 +226,6 @@ void Dialog::on_saveFolderPushButton_clicked()
     QString path = QFileDialog::getExistingDirectory(this, "Выберите каталог");
     if (path == "")
         return;
-    qDebug() << path << " selected!\n";
     if (path.back() != '/')
         path += '/';
     for (int i = ui->saveFolderComboBox->count() - 1; i >= 0; --i) {
@@ -263,7 +248,6 @@ void Dialog::on_saveFolderComboBox_currentTextChanged(const QString &path)
 {
     std::string s = path.toStdString();
     simpleScr->setPath(s);
-    qDebug() << "changing screenshot path!";
     cutScr->setPath(s);
 }
 

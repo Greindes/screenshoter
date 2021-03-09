@@ -2,7 +2,7 @@
 #define CUTSCREENSHOT_H
 
 #include <QObject>
-#include "screenshot.h"
+#include "Screenshot.h"
 
 class QPixmap;
 class QGraphicsView;
