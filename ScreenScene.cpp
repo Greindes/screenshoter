@@ -4,7 +4,6 @@
 #include <QKeyEvent>
 
 
-//QGraphicsScene(QRectF(0, 0, 1366, 768), parent)
 Scene::Scene(QObject *parent) : QGraphicsScene(parent)
 {
     imgItem = addPixmap(QPixmap());
@@ -24,15 +23,11 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                    QPen(QColor(Qt::red), 3, Qt::DashLine));
     x0 = rectMid->rect().x();
     y0 = rectMid->rect().y();
-    //if left button press {
-    //x0 = x, y0 = y;
-    //}
-    //initialize rect
 }
 
 void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    //resize rect
+    //Изменение размеров прямоугольника выделения
     qreal x1 = event->scenePos().x(), y1 = event->scenePos().y();
     qreal x = x0, y = y0;
     if (x1 < x0)
@@ -40,7 +35,7 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (y1 < y0)
         std::swap(y, y1);
     rectMid->setRect(x, y, x1 - x, y1 - y);
-
+    //прямоугольники, представляющие не выделенную часть, которые вызывают "осветление" скриншота
     rectLeft->setRect(0, 0, std::min(x, x1), sceneRect().height());
     rectTop->setRect(std::min(x, x1), 0, std::abs(x - x1), std::min(y, y1));
     rectRight->setRect(std::max(x, x1), 0, sceneRect().width() - std::max(x, x1), sceneRect().height());
@@ -49,16 +44,15 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    //copy rect area and save it or return? Send it in signal?
     qreal x1 = event->scenePos().x(), y1 = event->scenePos().y();
     qreal x = x0, y = y0;
     if (x1 < x0)
         std::swap(x, x1);
     if (y1 < y0)
         std::swap(y, y1);
-    emit screenshotTaken(img.copy(x, y, x1 - x, y1 - y));
     removeItem(rectMid);
     rectMid = nullptr;
+    emit screenshotTaken(img.copy(x, y, x1 - x, y1 - y));
 }
 
 QPixmap Scene::getImg() const
@@ -70,7 +64,6 @@ void Scene::setImg(const QPixmap &pix)
 {
     img = pix;
     imgItem->setPixmap(img);
-    //auto * rect = addRect(0, 0, img.width(), img.height(), QPen(), QBrush(Qt::white));
     setSceneRect(0, 0, img.width(), img.height());
     rectLeft->setRect(0, 0, img.width(), img.height());
     rectTop->setRect(0, 0, 0, 0);
@@ -81,6 +74,10 @@ void Scene::setImg(const QPixmap &pix)
 
 void Scene::keyReleaseEvent(QKeyEvent *event)
 {
+    if (rectMid) {
+        removeItem(rectMid);
+        rectMid = nullptr;
+    }
     if (event->matches(QKeySequence::Cancel))
         emit screenshotTaken(QPixmap());
 }
