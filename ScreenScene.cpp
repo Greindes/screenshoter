@@ -3,20 +3,27 @@
 #include <QGraphicsRectItem>
 #include <QKeyEvent>
 
+
 //QGraphicsScene(QRectF(0, 0, 1366, 768), parent)
 Scene::Scene(QObject *parent) : QGraphicsScene(parent)
 {
-
+    imgItem = addPixmap(QPixmap());
+    rectLeft = addRect(QRectF(sceneRect()), Qt::NoPen, QBrush(Qt::white));
+    rectLeft->setOpacity(0.3);
+    rectTop  = addRect(QRectF(sceneRect()), Qt::NoPen, QBrush(Qt::white));
+    rectTop->setOpacity(0.3);
+    rectRight  = addRect(QRectF(sceneRect()), Qt::NoPen, QBrush(Qt::white));
+    rectRight->setOpacity(0.3);
+    rectBottom  = addRect(QRectF(sceneRect()), Qt::NoPen, QBrush(Qt::white));
+    rectBottom->setOpacity(0.3);
 }
 
 void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    rect = addRect(QRectF(event->scenePos(), QSizeF(0.0, 0.0)),
-                   QPen(QColor(Qt::red), 3, Qt::DashLine),
-                   QBrush(Qt::black));
-    rect->setOpacity(0.11);
-    x0 = rect->rect().x();
-    y0 = rect->rect().y();
+    rectMid = addRect(QRectF(event->scenePos(), QSizeF(0.0, 0.0)),
+                   QPen(QColor(Qt::red), 3, Qt::DashLine));
+    x0 = rectMid->rect().x();
+    y0 = rectMid->rect().y();
     //if left button press {
     //x0 = x, y0 = y;
     //}
@@ -32,7 +39,12 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         std::swap(x, x1);
     if (y1 < y0)
         std::swap(y, y1);
-    rect->setRect(x, y, x1 - x, y1 - y);
+    rectMid->setRect(x, y, x1 - x, y1 - y);
+
+    rectLeft->setRect(0, 0, std::min(x, x1), sceneRect().height());
+    rectTop->setRect(std::min(x, x1), 0, std::abs(x - x1), std::min(y, y1));
+    rectRight->setRect(std::max(x, x1), 0, sceneRect().width() - std::max(x, x1), sceneRect().height());
+    rectBottom->setRect(std::min(x, x1), std::max(y, y1), std::abs(x - x1), sceneRect().height() - std::max(y, y1));
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -45,6 +57,8 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (y1 < y0)
         std::swap(y, y1);
     emit screenshotTaken(img.copy(x, y, x1 - x, y1 - y));
+    removeItem(rectMid);
+    rectMid = nullptr;
 }
 
 QPixmap Scene::getImg() const
@@ -55,12 +69,13 @@ QPixmap Scene::getImg() const
 void Scene::setImg(const QPixmap &pix)
 {
     img = pix;
-    clear();
+    imgItem->setPixmap(img);
     //auto * rect = addRect(0, 0, img.width(), img.height(), QPen(), QBrush(Qt::white));
     setSceneRect(0, 0, img.width(), img.height());
-    addPixmap(img.copy(0, 0, img.width(), img.height()));
-    auto * rect = addRect(0, 0, img.width(), img.height(), QPen(), QBrush(Qt::white));
-    rect->setOpacity(0.30);
+    rectLeft->setRect(0, 0, img.width(), img.height());
+    rectTop->setRect(0, 0, 0, 0);
+    rectRight->setRect(0, 0, 0, 0);
+    rectBottom->setRect(0, 0, 0, 0);
 }
 
 

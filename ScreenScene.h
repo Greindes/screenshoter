@@ -21,8 +21,13 @@ protected:
 
 private:
     qreal x0, y0;
-    QGraphicsRectItem * rect;
+    QGraphicsRectItem * rectMid;
+    QGraphicsRectItem * rectLeft;
+    QGraphicsRectItem * rectTop;
+    QGraphicsRectItem * rectRight;
+    QGraphicsRectItem * rectBottom;
     QPixmap img;
+    QGraphicsPixmapItem * imgItem;
 signals:
     void screenshotTaken(const QPixmap& ss);
 
